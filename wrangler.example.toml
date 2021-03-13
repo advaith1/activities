@@ -1,0 +1,11 @@
+name = "activities-bot"
+type = "javascript"
+account_id = ""
+workers_dev = true
+route = ""
+zone_id = ""
+webpack_config = "webpack.config.js"
+
+[build]
+upload_format = "service-worker"
+command = "npm run build"
