@@ -13,6 +13,14 @@ export async function handleRequest(request: Request): Promise<Response> {
       type: InteractionResponseType.Pong
     })
 
+  if (interaction.data.name === 'invite')
+    return respond({
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        content: '[Click to add to your server](https://discord.com/api/oauth2/authorize?client_id=819778342818414632&scope=bot%20applications.commands)'
+      }
+    })
+
   if (!interaction.data.resolved?.channels)
     return respond({
       type: InteractionResponseType.ChannelMessageWithSource,
