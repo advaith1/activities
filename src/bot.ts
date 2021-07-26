@@ -1,12 +1,12 @@
-import { verifyKey } from 'discord-interactions'
-import { InteractionType, InteractionResponseType, APIInteractionResponse, RESTPostAPIChannelInviteJSONBody, APIInvite, APIApplicationCommandGuildInteraction, ApplicationCommandOptionType, ChannelType, MessageFlags, InviteTargetUserType } from 'discord-api-types/v8'
+import { verify } from './verify'
+import { InteractionType, InteractionResponseType, APIInteractionResponse, RESTPostAPIChannelInviteJSONBody, APIInvite, ApplicationCommandOptionType, ChannelType, MessageFlags, APIApplicationCommandInteraction, InviteTargetType, RouteBases, Routes } from 'discord-api-types/v9'
+import { APIPingInteraction } from 'discord-api-types/payloads/v9/_interactions/ping'
 
 export async function handleRequest(request: Request): Promise<Response> {
   if (!request.headers.get('X-Signature-Ed25519') || !request.headers.get('X-Signature-Timestamp')) return Response.redirect('https://advaith.io')
-  const valid = verifyKey(await request.clone().arrayBuffer(), request.headers.get('X-Signature-Ed25519')!, request.headers.get('X-Signature-Timestamp')!, publicKey)
-  if (!valid) return new Response('', { status: 401 })
+  if (!await verify(request)) return new Response('', { status: 401 })
 
-  const interaction = await request.json() as APIApplicationCommandGuildInteraction
+  const interaction = await request.json() as APIPingInteraction | APIApplicationCommandInteraction
 
   if (interaction.type === InteractionType.Ping)
     return respond({
@@ -26,29 +26,29 @@ export async function handleRequest(request: Request): Promise<Response> {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         content: 'Please update your Discord app to use this command.',
-        flags: MessageFlags.EPHEMERAL
+        flags: MessageFlags.Ephemeral
       }
     })
 
   // set option types for ts
   if (!interaction.data.options ||
-      interaction.data.options[0].type !== ApplicationCommandOptionType.CHANNEL ||
-      interaction.data.options[1].type !== ApplicationCommandOptionType.STRING) return new Response()
+      interaction.data.options[0].type !== ApplicationCommandOptionType.Channel ||
+      interaction.data.options[1].type !== ApplicationCommandOptionType.String) return new Response()
 
-  if (interaction.data.resolved.channels[interaction.data.options[0].value].type !== ChannelType.GUILD_VOICE)
+  if (interaction.data.resolved.channels[interaction.data.options[0].value].type !== ChannelType.GuildVoice)
     return respond({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
         content: 'The selected channel must be a voice channel'
       }
     })
-    
-  const r = await fetch(`https://discord.com/api/v8/channels/${interaction.data.options[0].value}/invites`, {
+
+  const r = await fetch(`${RouteBases.api}${Routes.channelInvites(interaction.data.options[0].value)}`, {
     method: 'POST',
     headers: { authorization: `Bot ${token}`, 'content-type': 'application/json' },
     body: JSON.stringify({
       max_age: 0,
-      target_type: InviteTargetUserType.EMBEDDED_APPLICATION,
+      target_type: InviteTargetType.EmbeddedApplication,
       target_application_id: interaction.data.options[1].value
     } as RESTPostAPIChannelInviteJSONBody)
   })
