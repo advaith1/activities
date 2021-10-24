@@ -3,7 +3,6 @@
 A simple slash command bot for opening Discord voice channel activities, using [Cloudflare Workers](https://workers.cloudflare.com)
 
 **[Add the bot](https://discord.com/api/oauth2/authorize?client_id=819778342818414632&scope=bot%20applications.commands)**  
-(It'll show as offline, that's normal, it can still work)
 
 After adding, use `/activity`
 
