@@ -5,7 +5,7 @@
 function hex2bin(hex: string) {
   const buf = new Uint8Array(Math.ceil(hex.length / 2));
   for (var i = 0; i < buf.length; i++) {
-    buf[i] = parseInt(hex.substr(i * 2, 2), 16);
+    buf[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
   }
   return buf;
 }
