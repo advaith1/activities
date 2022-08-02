@@ -17,7 +17,8 @@ export async function handleRequest(request: Request): Promise<Response> {
     return respond({
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        content: '[Click to add to your server](https://discord.com/api/oauth2/authorize?client_id=819778342818414632&scope=bot%20applications.commands)'
+        content: '[Click to add to your server](https://discord.com/api/oauth2/authorize?client_id=819778342818414632&scope=bot%20applications.commands)',
+        flags: MessageFlags.Ephemeral
       }
     })
 
